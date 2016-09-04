@@ -78,17 +78,16 @@ public class BTree {
 
     public boolean insert(int val) {
 //        System.out.println("The value " + val + " is being inserted");
-        if(this.searchVal(val)){
+//        if(this.searchVal(val)){
 //            System.err.println("Value already exists");
-            return false;
-        }
-        
+//            return false;
+//        }
         
         Node temp = this.root;
-        this.root = this.insertVal(val, root);
+        this.root = BTree.insertVal(val, root);
         if(temp != this.root) this.highestLevel++;
 //        this.updateHLevel(this.root, 0);
-        updateAndResetLevels();
+//        updateAndResetLevels();
 //        System.out.println("The value " + val + " is inserted @ " + this.root + " node.keyCount = " + this.root.keyCount);
 //        Node.printNode(this.root);
         //Node.printNode(this.root.childs[0]);
@@ -173,15 +172,10 @@ public class BTree {
                 break;
             }
         }
-        int KKK = 0;
-        if (val == 665) {
-            KKK = 1;
-        }
         if (midNode != null) {
             arrN[c] = midNode.childs[0];
             arrN[c + 1] = midNode.childs[1];
         }
-        j = 0; int KK;
         for (Node x : node.childs) {
             if ((j == c)) {
                 j++;
