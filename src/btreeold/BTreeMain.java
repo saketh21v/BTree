@@ -19,7 +19,7 @@ public class BTreeMain {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int numVals = 10000000;
+        int numVals = 10000;
         BTree tree = new BTree((int) (Math.random()*numVals));
 //        int[] vals = {23, 43, 65, 78, 100, 120, 150, 160, 170, 180, 190, 200, 210, 124, 543, 129, 2, 123, 665, 223, 12, 5, 43224, 98};//150, {170, 180},129
 //        int[] vals = {4554,39,44,567,32,46,789,252,887,0,234,123,321,2334,4433,908,3,5,41};
@@ -49,8 +49,8 @@ public class BTreeMain {
         for (int x : vals) {
 //        for(int x=0;x<numVals;x++){
             ++counter;
-//            if(x == 6238) 
-//                System.out.println(counter+"th number = "+x);
+            if(x == 6238) 
+                System.out.println(counter+"th number = "+x);
             tempT = System.currentTimeMillis();
             tree.insert(x);
             tempT2 = System.currentTimeMillis();

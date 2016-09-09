@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class BTree {
 
     public final static int INVALID = -1;
-    public final static int ORDER = 5;
+    public final static int ORDER = 12;
     public final static int DEGREE = ORDER - 1;
     private Node root;
     private final int initLevel = 1;
@@ -146,6 +146,8 @@ public class BTree {
             Node.resetNodeChilds(node);
         for (int i = 0; i < DEGREE / 2; ++i) {
             node.keys[i] = arr[i];
+        }
+        for(int i=0;i < ((ORDER%2 == 0)? DEGREE/2+1:DEGREE/2);i++){
             sibl.keys[i] = arr[midPos + i + 1];
         }
         //Updating the childs of all the nodes : node, sibl and tParent
