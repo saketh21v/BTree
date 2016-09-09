@@ -29,48 +29,6 @@ public class BTree {
         return highestLevel;
     }
 
-    private void updateAndResetLevels() {
-        updateEmptyNodes(this.root, initLevel);
-        resetLevels(this.root, initLevel);
-    }
-
-    private void updateEmptyNodes(Node root, int h) {
-        if (h == this.highestLevel) {
-            return;
-        }
-
-        for (int i = 0; i < root.childs.length; ++i) {
-            if (root.childs[i] == null) {
-                root.childs[i] = new Node();
-            }
-        }
-        for (Node x : root.childs) {
-            updateEmptyNodes(x, h + 1);
-        }
-
-    }
-
-    private void resetLevels(Node root, int h) {
-        if (h == this.highestLevel || Node.isLeaf(root)) {
-            return;
-        }
-//        if(Node.isLeaf(root))
-//            return;
-        for (int i = 0; i < root.keys.length; i++) {
-            if (root.keys[i] == INVALID) {
-                //Node.resetNodeChilds(root.childs[i]);
-                Node.resetNodeChilds(root.childs[i + 1]);
-            }
-        }
-        if (root.keys[0] == INVALID) {
-            Node.resetNodeChilds(root.childs[0]);
-            return;
-        }
-        for (Node x : root.childs) {
-            resetLevels(x, h + 1);
-        }
-    }
-
     public static BTree createBTree(int val) {
         BTree btree = new BTree(val);
         return btree;
@@ -86,12 +44,6 @@ public class BTree {
         Node temp = this.root;
         this.root = BTree.insertVal(val, root);
         if(temp != this.root) this.highestLevel++;
-//        this.updateHLevel(this.root, 0);
-//        updateAndResetLevels();
-//        System.out.println("The value " + val + " is inserted @ " + this.root + " node.keyCount = " + this.root.keyCount);
-//        Node.printNode(this.root);
-        //Node.printNode(this.root.childs[0]);
-        //Node.printNode(this.root.childs[1]);
         return true;
     }
 
@@ -155,7 +107,7 @@ public class BTree {
     private static Node splitNode(int val, Node midNode, Node node) {
         Node tParent = new Node(); // Temporary Parent
         Node sibl = new Node();
-        int midPos = ORDER / 2;
+        int midPos = DEGREE / 2;
 
         int[] arr = new int[DEGREE + 1];
         Node[] arrN = new Node[ORDER + 1];
@@ -203,7 +155,7 @@ public class BTree {
             }
             j = 0;
             int ii = 0;
-            for (int i = ((ORDER / 2) + 1); i < (ORDER + 1); ++i) {
+            for (int i = ((DEGREE / 2) + 1); i < (ORDER + 1); ++i) {
                 sibl.childs[j++] = arrN[i];
             }
         }
@@ -214,12 +166,6 @@ public class BTree {
         tParent.keys[0] = arr[midPos];
         tParent.childs[0] = node;
         tParent.childs[1] = sibl;
-
-        for (int i = 2;
-                i < ORDER;
-                ++i) {
-            tParent.childs[i] = new Node();
-        }
 
         tParent.updateKeyCount();
 

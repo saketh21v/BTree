@@ -42,13 +42,15 @@ public class BTreeMain {
         for(Integer x:newVals){
             vals[i++] = x;
         }
+        newVals.clear();
         long time = 0;
         long tempT=0, tempT2=0;
         int counter = 0; boolean insert = false;
         for (int x : vals) {
 //        for(int x=0;x<numVals;x++){
             ++counter;
-//            if(counter%1000 == 0) System.out.println(counter+"th number = "+x);
+//            if(x == 6238) 
+//                System.out.println(counter+"th number = "+x);
             tempT = System.currentTimeMillis();
             tree.insert(x);
             tempT2 = System.currentTimeMillis();
