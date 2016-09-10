@@ -5,33 +5,35 @@
  */
 package btreeold;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  *
  * @author Saketh
  */
-public class BTree {
+public class BTree implements Serializable {
 
     public final static int INVALID = -1;
-    public final static int ORDER = 12;
+    public final static int ORDER = 5;
     public final static int DEGREE = ORDER - 1;
-    private Node root;
+    public Node root;
     private final int initLevel = 1;
     private int highestLevel = initLevel;
+    private String name;
 
-    BTree(int val) {
+    BTree(int val, String name) {
         this.root = new Node();
         this.root.keys[0] = val;
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public int getHighestLevel() {
         return highestLevel;
-    }
-
-    public static BTree createBTree(int val) {
-        BTree btree = new BTree(val);
-        return btree;
     }
 
     public boolean insert(int val) {
@@ -40,16 +42,20 @@ public class BTree {
 //            System.err.println("Value already exists");
 //            return false;
 //        }
-        
+
         Node temp = this.root;
         this.root = BTree.insertVal(val, root);
-        if(temp != this.root) this.highestLevel++;
+        if (temp != this.root) {
+            this.highestLevel++;
+        }
         return true;
     }
 
     private static Node insertVal(int val, Node node) {
         //Making sure all the counts are proper.
-        if(node == null) return null;
+        if (node == null) {
+            return null;
+        }
         node.updateChildCount();
         node.updateKeyCount();
 
@@ -142,12 +148,13 @@ public class BTree {
             ++j;
         }
         Node.resetNodeKeys(node);
-        if(!Node.isLeaf(node))
+        if (!Node.isLeaf(node)) {
             Node.resetNodeChilds(node);
+        }
         for (int i = 0; i < DEGREE / 2; ++i) {
             node.keys[i] = arr[i];
         }
-        for(int i=0;i < ((ORDER%2 == 0)? DEGREE/2+1:DEGREE/2);i++){
+        for (int i = 0; i < ((ORDER % 2 == 0) ? DEGREE / 2 + 1 : DEGREE / 2); i++) {
             sibl.keys[i] = arr[midPos + i + 1];
         }
         //Updating the childs of all the nodes : node, sibl and tParent
@@ -199,19 +206,44 @@ public class BTree {
     }
 
     private static boolean search(int key, Node root) {
-        if(root == null) return false;
-        if(root.isEmpty()) return false;
-        int i=0;
-        for(i=0;i<DEGREE;++i){
-            if(root.keys[i] == INVALID)
+        if (root == null) {
+            return false;
+        }
+        if (root.isEmpty()) {
+            return false;
+        }
+        int i = 0;
+        for (i = 0; i < DEGREE; ++i) {
+            if (root.keys[i] == INVALID) {
                 break;
-            if(root.keys[i] == key)
+            }
+            if (root.keys[i] == key) {
                 return true;
-            if(root.keys[i] > key)
+            }
+            if (root.keys[i] > key) {
                 return search(key, root.childs[i]);
+            }
         }
 //        if(root.keys[i] == INVALID)
 //            return search(key, root.childs[i]);
         return search(key, root.childs[i]);
+    }
+
+    public static void writeTree(BTree tree, String parentPath) {
+        BTree.writeTreeNode(tree.root, parentPath, "root");
+    }
+
+    private static void writeTreeNode(Node node, String parentPath, String path) {
+        if (node == null) {
+            return;
+        }
+        Node.writeNode(node, parentPath, path);
+        StringBuilder ppath = new StringBuilder(path + "#");
+        for (int i = 0; i < node.childs.length; i++) {
+            ppath.append(String.valueOf(i));
+            writeTreeNode(node.childs[i], parentPath, ppath.toString());
+            int ind = ppath.length() - 1;
+            ppath.deleteCharAt(ind);
+        }
     }
 }

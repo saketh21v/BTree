@@ -8,17 +8,26 @@ package btreeold;
 import static btreeold.BTree.DEGREE;
 import static btreeold.BTree.INVALID;
 import static btreeold.BTree.ORDER;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Saketh
  */
-public class Node {
+public class Node implements Serializable {
+
     int[] keys = new int[DEGREE];
     Node[] childs = new Node[ORDER];
     private int keyCount = 0;
     private int childCount = 0;
     public int level = 0;
+    private String path;
+    
     Node() {
         this.level = level;
         for (int i = 0; i < keys.length; ++i) {
@@ -32,8 +41,8 @@ public class Node {
     boolean isFull() {
         return (keyCount == DEGREE);
     }
-    
-    boolean isEmpty(){
+
+    boolean isEmpty() {
         return (keyCount == 0);
     }
 
@@ -103,17 +112,28 @@ public class Node {
             }
         }
     }
+    
+    public String getPath() {
+        return path;
+    }
+    
+    public void setPath(String path){
+        this.path = path;
+    }
 
     static void resetNodeKeys(Node node) {
         for (int i = 0; i < node.keys.length; ++i) {
             node.keys[i] = INVALID;
         }
     }
-    
-    static void resetNodeChilds(Node node){
-        if(Node.isLeaf(node)) return;
-        for(int i = 0;i<node.childs.length;++i)
+
+    static void resetNodeChilds(Node node) {
+        if (Node.isLeaf(node)) {
+            return;
+        }
+        for (int i = 0; i < node.childs.length; ++i) {
             node.childs[i] = new Node();
+        }
     }
 
     static boolean isLeaf(Node node) {
@@ -128,5 +148,16 @@ public class Node {
             System.out.printf(node.keys[i] + " ");
         }
         System.out.println();
+    }
+    
+    public static void writeNode(Node node,String parentPath, String path){
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(parentPath+"/"+path+".bnode"));
+            out.writeObject(node);
+            out.close();
+        } catch (IOException ex) {
+            Logger.getLogger(BTree.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
     }
 }
