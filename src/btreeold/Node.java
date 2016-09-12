@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class Node implements Serializable {
 
     int[] keys = new int[DEGREE];
-    Node[] childs = new Node[ORDER];
+    transient Node[] childs = new Node[ORDER];
     private int keyCount = 0;
     private int childCount = 0;
     public int level = 0;

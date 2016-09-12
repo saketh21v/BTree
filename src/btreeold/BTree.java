@@ -5,8 +5,13 @@
  */
 package btreeold;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,6 +26,7 @@ public class BTree implements Serializable {
     private final int initLevel = 1;
     private int highestLevel = initLevel;
     private String name;
+    ObjectOutputStream oout;
 
     BTree(int val, String name) {
         this.root = new Node();
@@ -185,6 +191,40 @@ public class BTree implements Serializable {
 
     public void printBTree() {
         this.printTree(this.root, 0);
+    }
+
+    void writeToDisk(String parentPath) {
+        ObjectOutputStream oout = null;
+        try {
+            oout = new ObjectOutputStream(new FileOutputStream(parentPath+"/"+this.name+".tree"));
+            oout.writeObject(this);
+            oout.close();
+            this.writeTreeToDisk(root, parentPath, "root");
+        } catch (IOException ex) {
+            Logger.getLogger(BTree.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                oout.close();
+            } catch (IOException ex) {
+                Logger.getLogger(BTree.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
+
+    private void writeTreeToDisk(Node root, String parentPath, String path) {
+        if (root == null || root.isEmpty()) {
+            return;
+        }
+//        if (root == this.root) {
+//            Node.writeNode(root, parentPath, "root");
+//        }
+        if(root != this.root)
+            Node.writeNode(root, parentPath, path);
+        for (int x = 0; x < root.childs.length; x++) {
+            writeTreeToDisk(root.childs[x], parentPath, path + "#" + x);
+//            Node.writeNode(root.childs[x], parentPath, path + "#" + x);
+        }
     }
 
     private void printTree(Node root, int i) {
