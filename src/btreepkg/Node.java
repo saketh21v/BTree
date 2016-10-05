@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package btreeold;
+package btreepkg;
 
-import static btreeold.BTree.DEGREE;
-import static btreeold.BTree.INVALID;
-import static btreeold.BTree.ORDER;
+import static btreepkg.BTree.DEGREE;
+import static btreepkg.BTree.INVALID;
+import static btreepkg.BTree.ORDER;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -152,7 +152,7 @@ public class Node implements Serializable {
     
     public static void writeNode(Node node,String parentPath, String path){
         try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(parentPath+"/"+path+".bnode"));
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(parentPath+"/"+path+".bnode", false));
             out.writeObject(node);
             out.close();
         } catch (IOException ex) {

@@ -3,10 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package btreeold;
+package btreepkg;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -20,17 +23,19 @@ import java.util.logging.Logger;
 public class BTree implements Serializable {
 
     public final static int INVALID = -1;
-    public final static int ORDER = 5;
-    public final static int DEGREE = ORDER - 1;
+    public static int ORDER = 5;
+    public static int DEGREE = ORDER - 1;
     public Node root;
     private final int initLevel = 1;
     private int highestLevel = initLevel;
     private String name;
+    int numVals = 0;
     ObjectOutputStream oout;
 
-    BTree(int val, String name) {
+    BTree(String name, int order) {
+        BTree.ORDER = order;
+        BTree.DEGREE = ORDER - 1;
         this.root = new Node();
-        this.root.keys[0] = val;
         this.name = name;
     }
 
@@ -48,7 +53,7 @@ public class BTree implements Serializable {
 //            System.err.println("Value already exists");
 //            return false;
 //        }
-
+        ++numVals;
         Node temp = this.root;
         this.root = BTree.insertVal(val, root);
         if (temp != this.root) {
@@ -63,7 +68,7 @@ public class BTree implements Serializable {
             return null;
         }
         node.updateChildCount();
-        node.updateKeyCount();
+//        node.updateKeyCount();
 
         if (Node.isLeaf(node)) { // Checking if leaf node. CASE 1: Leaf Node.
             if (!node.isFull()) { //Leaf node not full case.
@@ -196,7 +201,7 @@ public class BTree implements Serializable {
     void writeToDisk(String parentPath) {
         ObjectOutputStream oout = null;
         try {
-            oout = new ObjectOutputStream(new FileOutputStream(parentPath+"/"+this.name+".tree"));
+            oout = new ObjectOutputStream(new FileOutputStream(parentPath + "/" + this.name + ".tree", false));
             oout.writeObject(this);
             oout.close();
             this.writeTreeToDisk(root, parentPath, "root");
@@ -219,8 +224,9 @@ public class BTree implements Serializable {
 //        if (root == this.root) {
 //            Node.writeNode(root, parentPath, "root");
 //        }
-        if(root != this.root)
+        if (root != this.root) {
             Node.writeNode(root, parentPath, path);
+        }
         for (int x = 0; x < root.childs.length; x++) {
             writeTreeToDisk(root.childs[x], parentPath, path + "#" + x);
 //            Node.writeNode(root.childs[x], parentPath, path + "#" + x);
@@ -242,10 +248,10 @@ public class BTree implements Serializable {
     }
 
     public boolean searchVal(int val) {
-        return search(val, this.root);
+        return search(val, this.root, 0);
     }
 
-    private static boolean search(int key, Node root) {
+    private static boolean search(int key, Node root, int level) {
         if (root == null) {
             return false;
         }
@@ -258,19 +264,43 @@ public class BTree implements Serializable {
                 break;
             }
             if (root.keys[i] == key) {
+                System.out.print("The value " + key + " is found in ");
+                Node.printNode(root);
                 return true;
             }
             if (root.keys[i] > key) {
-                return search(key, root.childs[i]);
+                return search(key, root.childs[i], level + 1);
             }
         }
 //        if(root.keys[i] == INVALID)
 //            return search(key, root.childs[i]);
-        return search(key, root.childs[i]);
+        return search(key, root.childs[i], level + 1);
+    }
+    
+    public static BTree readTree(String name,String parentPath){
+        BTree tree = null;
+        try {
+            try (ObjectInputStream oin = new ObjectInputStream(new FileInputStream(parentPath+"/"+name+".btree"))) {
+                tree = (BTree) oin.readObject();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(BTree.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally{
+            return tree;
+        }
     }
 
     public static void writeTree(BTree tree, String parentPath) {
-        BTree.writeTreeNode(tree.root, parentPath, "root");
+        try ( //        BTree.writeTreeNode(tree.root, parentPath, "root");
+                ObjectOutputStream oout = new ObjectOutputStream(new FileOutputStream(parentPath +"/"+tree.name + ".btree"))) {
+            oout.writeObject(tree);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(BTree.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BTree.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     private static void writeTreeNode(Node node, String parentPath, String path) {
